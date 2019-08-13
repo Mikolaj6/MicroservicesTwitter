@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Kosmiczny Handlarz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="styles/login.css">
+</head>
+
+<body>
+    <form method="POST" action="/doreg" encType="multipart/form-data">
+        <div class="box">
+            <h1>Register</h1>
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    
+            <input type="text" name="nick" class="email" />
+    
+            <input type="password" name="password" class="email" />
+        
+            <input type="submit" value="Register" class="btn">
+    
+            <a href="login" class="btn" id="btn2"> Goto Login </a>
+        </div>
+    </form>
+
+</body>
+
+</html>
