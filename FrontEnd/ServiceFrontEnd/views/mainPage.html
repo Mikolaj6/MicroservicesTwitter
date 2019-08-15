@@ -20,14 +20,56 @@
 
             <h2 id="feed" class="btn green">Your feed</h2>
 
+            <h2 id="yourPosts" class="btn green">Your posts</h2>
+
             <h2 id="friends" class="btn blue">Checkout friends!!!</h2>
         </div>
 
-        <!-- <div class="clear"></div> -->
-
+        <div id="newPostPopup" class="popup">
         
+            <div class="popup-overlay">
+                <span class="close">&times;</span>
+                
+                <h3 class="headersInPopups"> Write and post whatever you want!!! </h3>
+                
+                <form id="newPost" onsubmit="">
+                    <div>
+                        <p id="newPostTitleWord" class="postLabel">Title:</p>
+                        <input id='newPostTitle' type="text" name="title" class="postInputField">
+                        <p id="newPostTitleWord" class="postLabel">Contents:</p>
+                        <textarea id="newPostContent" name="contents" rows="10" cols="30" class="postInputField"></textarea>
+                        <input id='newPostSubmit' type="submit" value="Post" class="btn blue">
+                    </div>
+                </form>
+            </div>
+        </div>
 
+        <div id="feedPopup" class="popup">
+        
+            <div class="popup-overlay">
+                <span class="close">&times;</span>
+        
+                <h3> TESTING feed </h3>
+            </div>
+        </div>
 
+        <div id="yourPostsPopup" class="popup">
+        
+            <div class="popup-overlay">
+                <span class="close">&times;</span>
+        
+                <h3> TESTING yourPosts </h3>
+            </div>
+        </div>
+        
+        <div id="friendsPopup" class="popup">
+        
+            <div class="popup-overlay">
+                <span class="close">&times;</span>
+        
+                <h3> TESTING friends </h3>
+            </div>
+        </div>
 
 </body>
 

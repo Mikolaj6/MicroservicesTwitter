@@ -6,6 +6,19 @@ body {
     text-align: center;
 }
 
+.close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.close:hover {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
 .logout {
     position: absolute;
     top: 0px;
@@ -34,8 +47,8 @@ body {
 
 #options {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-areas: "newPost feed friends";
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-areas: "newPost feed yourPosts friends";
     grid-column-gap: 0px;
     grid-row-gap: 0px;
 }
@@ -50,6 +63,10 @@ body {
 
 #friends {
     grid-area: friends;
+}
+
+#yourPosts {
+    grid-area: yourPosts;
 }
 
 .blue {
@@ -71,7 +88,7 @@ body {
 }
 
 .btn {
-    width: 360px;
+    width: 270px;
     padding-top: 5px;
     padding-bottom: 5px;
     color: white;
@@ -87,4 +104,90 @@ body {
 
 .clear {
     clear: both;
+}
+
+/* ---------POPUPS--------- */
+
+.popup {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    padding-top: 1%;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    margin-top: 0px;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.popup-overlay {
+    border-radius: 0.6em;
+    background-color: lightblue;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 0px;
+    padding: 1em;
+    border: 1px solid #888;
+    width: 95%;
+    /* height: 80%; */
+    padding-bottom: 2em;
+    list-style-type: none;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.headersInPopups {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1.7em;
+    color: #0525c7;
+    text-decoration: none;
+}
+
+.postInputField {
+    background: #ecf0f1;
+    border: #ccc 1px solid;
+    border-bottom: #ccc 3px solid;
+    padding: 8px;
+    margin-top: 10px;
+    font-size: 1em;
+    border-radius: 4px;
+}
+
+.postLabel {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1.5em;
+    color: #2c1d14;
+    font-weight: bold;
+    margin: 0;
+}
+
+/* -------- New post handling --------- */
+
+#newPostTitleWord {
+    text-align: left;
+    margin-left: 25px;
+}
+
+#newPostTitle {
+    margin-left: 20px;
+    margin-bottom: 8px;
+    width: 40%;
+    display: block;
+}
+
+#newPostSubmit {
+    margin-top: 20px;
+}
+
+#newPostContent {
+    margin-left: 0px;
+    text-align: left;
+    width: 97%;
+    font-size: 1.3em;
+    height: 400px;
+}
+
+#newPostPopup {
+    display: block;
 }
