@@ -1,0 +1,21 @@
+version: "3"
+services:
+  front_end:
+    image: mikolaj6/front_end
+    container_name: front_end
+    ports:
+      - 8888:3000
+    depends_on:
+      - users_redis
+    volumes:
+      - ./FrontEnd/ServiceFrontEnd/views:/opt/servicefront/views
+
+  users:
+    image: mikolaj6/users
+    container_name: users
+    depends_on:
+      - users_redis
+  
+  users_redis:
+    image: redis
+    container_name: users_redis
