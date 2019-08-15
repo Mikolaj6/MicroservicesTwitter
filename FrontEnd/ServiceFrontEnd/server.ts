@@ -38,7 +38,7 @@ const usersServer = 'users:2000'
 const redisServerHostname = 'users_redis'
 const redisServerPort = '6379'
 const JWT_SECRET = "SHHHHHH"
-const JWT_EXPIRATION_SECONDS = 30
+const JWT_EXPIRATION_SECONDS = 3600
 
 // Constants for connections
 var registrationHandler = redis.createClient(redisServerPort, redisServerHostname);

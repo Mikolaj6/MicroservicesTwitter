@@ -1,0 +1,90 @@
+body {
+    font-family: 'Open Sans', sans-serif;
+    background: #3498db;
+    margin: 0 auto 0 auto;
+    width: 100%;
+    text-align: center;
+}
+
+.logout {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    font-size: 1.2em;
+    font-weight: bold;
+    text-decoration: none;
+    background: #2ecc71;
+    width: 125px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    color: white;
+    border-radius: 4px;
+    border: #27ae60 1px solid;
+    margin-top: 20px;
+    margin-right: 20px;
+}
+
+.logout:hover {
+    background: #2CC06B;
+}
+
+#Welcome {
+    color: #c5ffe1;
+}
+
+#options {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-areas: "newPost feed friends";
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+}
+
+#newPost {
+    grid-area: newPost;
+}
+
+#feed {
+    grid-area: feed;
+}
+
+#friends {
+    grid-area: friends;
+}
+
+.blue {
+    background: #6941fc;
+    border: #072764 1px solid;
+}
+
+.blue:hover {
+    background: #603ca5;
+}
+
+.green {
+    background: #2ecc71;
+    border: #1f8517 1px solid;
+}
+
+.green:hover {
+    background: #2CC06B;
+}
+
+.btn {
+    width: 360px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    color: white;
+    border-radius: 4px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: auto;
+    margin-right: auto;
+    font-weight: 800;
+    font-size: 1.5em;
+    text-decoration: none;
+}
+
+.clear {
+    clear: both;
+}

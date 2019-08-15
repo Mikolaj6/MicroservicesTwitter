@@ -6,14 +6,28 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Instagram</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" media="screen" href="styles/login.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="styles/mainPage.css">
 </head>
 
 <body>
 
-    <h1> Witaj <%= username %> </h1>
+        <a href="/logout" class="logout"> Logout </a>
+    
+        <h1 id="Welcome"> Welcome <%= username %> </h1>
 
-    <a href="/logout" > Logout </a>
+        <div id="options">
+            <h2 id="newPost" class="btn blue">Write post</h2>
+
+            <h2 id="feed" class="btn green">Your feed</h2>
+
+            <h2 id="friends" class="btn blue">Checkout friends!!!</h2>
+        </div>
+
+        <!-- <div class="clear"></div> -->
+
+        
+
+
 
 </body>
 
