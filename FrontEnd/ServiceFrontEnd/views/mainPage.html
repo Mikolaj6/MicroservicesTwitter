@@ -6,15 +6,95 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Instagram</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" media="screen" href="styles/login.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="styles/mainPage.css">
 </head>
 
 <body>
 
-    <h1> Witaj <%= username %> </h1>
+        <a href="/logout" class="logout"> Logout </a>
+    
+        <h1 id="Welcome"> Welcome <%= username %> </h1>
 
-    <a href="/logout" > Logout </a>
+        <div id="options">
+            <h2 id="newPost" class="btn blue">Write post</h2>
 
+            <h2 id="feed" class="btn green">Your feed</h2>
+
+            <h2 id="yourPosts" class="btn green">Your posts</h2>
+
+            <h2 id="friends" class="btn blue">Checkout friends!!!</h2>
+        </div>
+
+        <div id="newPostPopup" class="popup">
+        
+            <div class="popup-overlay">
+                <span class="close">&times;</span>
+                
+                <h3 class="headersInPopups"> Write and post whatever you want!!! </h3>
+                
+                <form id="newPost" method="POST" onsubmit="return newPostValidate()" action="/newPost" encType="multipart/form-data">
+                    <div>
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <p id="newPostTitleWord" class="postLabel">Title:</p>
+                        <input id='newPostTitle' type="text" name="title" class="postInputField">
+                        <p id="newPostTitleWord" class="postLabel">Contents:</p>
+                        <textarea id="newPostContent" name="contents" class="postInputField"></textarea>
+                        <input id='newPostSubmit' type="submit" value="Post" class="btn blue">
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="feedPopup" class="popup">
+        
+            <div class="popup-overlay">
+                <span class="close">&times;</span>
+        
+                <h3> TESTING feed </h3>
+            </div>
+        </div>
+
+        <div id="yourPostsPopup" class="popup">
+        
+            <div class="popup-overlay">
+                <span class="close">&times;</span>
+                
+                <h3 class="headersInPopups"> Your posts </h3>
+                
+                <ul id="postList">
+                    <li>
+                        <h3 class="postsHeaders TitleAndName"> USER </h3>
+                        <h3 class="postsHeaders TitleAndName"> TITLE </h3>
+                        <h4 class="postsHeaders date"> DATE </h4>
+                        <p class="contents"> CONTENTS .... 
+                            ......
+                            asdadasdasdasd
+                        </p>
+                    </li>
+                    <li>
+                        <h3 class="postsHeaders TitleAndName"> USER2 </h3>
+                        <h3 class="postsHeaders TitleAndName"> TITLE2 </h3>
+                        <h4 class="postsHeaders date"> DATE2 </h4>
+                        <p class="contents"> CONTENTS ....
+                            ......
+                            asdadasdasdasd
+                        </p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="friendsPopup" class="popup">
+        
+            <div class="popup-overlay">
+                <span class="close">&times;</span>
+        
+                <h3> TESTING friends </h3>
+            </div>
+        </div>
+        
+        <script src="js/mainPage.js"></script>
 </body>
+
 
 </html>

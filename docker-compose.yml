@@ -9,6 +9,7 @@ services:
       - users_redis
     volumes:
       - ./FrontEnd/ServiceFrontEnd/views:/opt/servicefront/views
+      - ./FrontEnd/ServiceFrontEnd/public/styles:/opt/servicefront/public/styles
 
   users:
     image: mikolaj6/users
