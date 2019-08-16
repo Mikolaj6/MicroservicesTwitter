@@ -74,10 +74,10 @@ app.get('/logout', function (req, res) {
     res.redirect('login');
 });
 
-app.get('/mainPage', verifyToken, function (req, res) {
+app.get('/mainPage', verifyToken, csrfProtection, function (req, res) {
     console.log("DEBUG: Checking res.locals.username:" + res.locals.username)
 
-    res.render('mainPage', { username: res.locals.username });
+    res.render('mainPage', { username: res.locals.username, csrfToken: req.csrfToken() });
 });
 
 app.post('/dolog', parseForm, csrfProtection, function (req, res) {
@@ -125,6 +125,11 @@ app.post('/doreg', parseForm, csrfProtection, function (req, res) {
         registrationHandler.publish("registration", "|USERNAME:" + req.body.nick + "|PASSWORD:" + req.body.password + "|");
         res.redirect('login')
     }
+});
+
+app.post('/newPost', parseForm, csrfProtection, function (req, res) {
+    console.log("DEBUG: added post of title: " + req.body.title + "|contents:" + req.body.contents + "|")
+    res.redirect('mainPage')
 });
 
 const port = 3000

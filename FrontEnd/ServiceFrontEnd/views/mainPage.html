@@ -32,12 +32,13 @@
                 
                 <h3 class="headersInPopups"> Write and post whatever you want!!! </h3>
                 
-                <form id="newPost" onsubmit="">
+                <form id="newPost" method="POST" onsubmit="return newPostValidate()" action="/newPost" encType="multipart/form-data">
                     <div>
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                         <p id="newPostTitleWord" class="postLabel">Title:</p>
                         <input id='newPostTitle' type="text" name="title" class="postInputField">
                         <p id="newPostTitleWord" class="postLabel">Contents:</p>
-                        <textarea id="newPostContent" name="contents" rows="10" cols="30" class="postInputField"></textarea>
+                        <textarea id="newPostContent" name="contents" class="postInputField"></textarea>
                         <input id='newPostSubmit' type="submit" value="Post" class="btn blue">
                     </div>
                 </form>
@@ -57,8 +58,29 @@
         
             <div class="popup-overlay">
                 <span class="close">&times;</span>
-        
-                <h3> TESTING yourPosts </h3>
+                
+                <h3 class="headersInPopups"> Your posts </h3>
+                
+                <ul id="postList">
+                    <li>
+                        <h3 class="postsHeaders TitleAndName"> USER </h3>
+                        <h3 class="postsHeaders TitleAndName"> TITLE </h3>
+                        <h4 class="postsHeaders date"> DATE </h4>
+                        <p class="contents"> CONTENTS .... 
+                            ......
+                            asdadasdasdasd
+                        </p>
+                    </li>
+                    <li>
+                        <h3 class="postsHeaders TitleAndName"> USER2 </h3>
+                        <h3 class="postsHeaders TitleAndName"> TITLE2 </h3>
+                        <h4 class="postsHeaders date"> DATE2 </h4>
+                        <p class="contents"> CONTENTS ....
+                            ......
+                            asdadasdasdasd
+                        </p>
+                    </li>
+                </ul>
             </div>
         </div>
         
@@ -70,7 +92,9 @@
                 <h3> TESTING friends </h3>
             </div>
         </div>
-
+        
+        <script src="js/mainPage.js"></script>
 </body>
+
 
 </html>

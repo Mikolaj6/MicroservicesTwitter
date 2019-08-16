@@ -188,6 +188,34 @@ body {
     height: 400px;
 }
 
-#newPostPopup {
-    display: block;
+/* -------- Show your posts handling --------- */
+
+#postList {
+    text-align: left;
+    list-style: none;
+}
+
+.postsHeaders {
+    margin-top: 5px;
+    margin-right: 20px;
+    margin-bottom: 0px;
+    display: inline-block;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.TitleAndName {
+    font-size: 1.3em;
+    color: #6030af;
+}
+
+.date {
+    font-size: 1.05em;
+    color: #456dab;
+}
+
+.contents {
+    margin-top: 8px;
+    white-space: pre-line;
+    font-size: 0.95em;
+    margin-left: 15px;
 }
