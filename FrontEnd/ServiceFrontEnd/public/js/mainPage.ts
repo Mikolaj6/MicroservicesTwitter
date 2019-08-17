@@ -15,10 +15,14 @@ let feed = document.getElementById('feed');
 let yourPosts = document.getElementById('yourPosts');
 let friends = document.getElementById('friends');
 
+let postList = document.getElementById('postList');
+let loadOlder = document.getElementById('loadOlder');
+let refresh = document.getElementById('refresh');
+
 // Adding closing and opening popups
 
 //Closes
-newPostClose.onclick = function() {
+newPostClose.onclick = function () {
     newPostPopup.style.display = "none";
 }
 
@@ -28,6 +32,7 @@ feedClose.onclick = function () {
 
 yourPostsClose.onclick = function () {
     yourPostsPopup.style.display = "none";
+    resetDates()
 }
 
 friendsClose.onclick = function () {
@@ -40,6 +45,7 @@ window.onclick = function (event) {
         feedPopup.style.display = "none";
         yourPostsPopup.style.display = "none";
         friendsPopup.style.display = "none";
+        resetDates()
     }
 }
 
@@ -52,12 +58,26 @@ feed.onclick = function () {
     feedPopup.style.display = "block";
 }
 
-yourPosts.onclick = function () {
+yourPosts.onclick = async function () {
     yourPostsPopup.style.display = "block";
+    let response = await loadMorePosts()
+    buildUserPosts(response, true)
 }
 
 friends.onclick = function () {
     friendsPopup.style.display = "block";
+}
+
+// Refresh and Load more for user
+
+loadOlder.onclick = async function () {
+    let response = await loadMorePosts()
+    buildUserPosts(response, true)
+}
+
+refresh.onclick = async function () {
+    let response = await refreshPosts()
+    buildUserPosts(response, false)
 }
 
 // Send new Post
@@ -79,10 +99,93 @@ function newPostValidate() {
             asyncAlert("Post too long, can be max 200 characters")
             return false;
         }
+        if (newPostContent.value.includes(';') || newPostContent.value.includes('|')) {
+            asyncAlert("Post contains invalid character ('|' or ';')")
+            return false;
+        }
+        if (newPostTitle.value.includes(';') || newPostTitle.value.includes('|')) {
+            asyncAlert("Post title contains invalid character ('|' or ';')")
+            return false;
+        }
+
         return true;
     }
 }
 
 async function asyncAlert(message) {
     alert(message)
+}
+
+// My posts update 
+
+async function loadMorePosts() {
+    let response
+    try {
+        let res = await fetch('/posts/getMorePosts');
+        response = await res.json();
+    } catch (err) {
+        return null
+    }
+    return response
+}
+
+async function refreshPosts() {
+    let response
+    try {
+        let res = await fetch('/posts/refresh');
+        response = await res.json();
+    } catch (err) {
+        return null
+    }
+    return response
+}
+
+async function resetDates() {
+    postList.innerHTML = ""
+    try {
+        await fetch('/resetDates');
+    } catch (err) {
+        return null
+    }
+}
+
+// Functions build a list of posts if append is set to true,
+// posts will be ppended at the end of the list, otherwise they
+// will be prepended
+function buildUserPosts(response, append: boolean): void {
+    for (let idx in response) {
+        let idxActual
+
+        if (append) {
+            idxActual = parseInt(idx)
+        } else {
+            idxActual = response.length - parseInt(idx) - 1
+        }
+
+        let node = document.createElement("LI");
+        let title = document.createElement("h3");
+        let date = document.createElement("h3");
+        let contents = document.createElement("p");
+        title.classList.add('postsHeaders');
+        title.classList.add('TitleAndName');
+        date.classList.add('postsHeaders');
+        date.classList.add('date');
+        contents.classList.add('contents');
+        contents.innerHTML = response[idxActual]['contents']
+        title.innerHTML = response[idxActual]['title']
+        let dateStr = new Date(response[idxActual]['date']).toString()
+        let dateArr = dateStr.split(' ')
+        dateArr = dateArr.slice(0, 5)
+        date.innerHTML = dateArr.join(' ')
+
+        node.appendChild(title);
+        node.appendChild(date);
+        node.appendChild(contents);
+
+        if (append) {
+            postList.appendChild(node);
+        } else {
+            postList.prepend(node);
+        }
+    }
 }

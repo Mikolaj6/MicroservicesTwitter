@@ -123,6 +123,7 @@ body {
 }
 
 .popup-overlay {
+    position: relative;
     border-radius: 0.6em;
     background-color: lightblue;
     margin-left: auto;
@@ -131,7 +132,8 @@ body {
     padding: 1em;
     border: 1px solid #888;
     width: 95%;
-    /* height: 80%; */
+    /* height: 90%;
+    overflow: scroll; */
     padding-bottom: 2em;
     list-style-type: none;
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
@@ -218,4 +220,27 @@ body {
     white-space: pre-line;
     font-size: 0.95em;
     margin-left: 15px;
+}
+
+#loadOlder {
+    right: 30px;
+}
+
+#refresh {
+    right: 185px;
+}
+
+.buttonLeft {
+    position: absolute;
+    top: 0px;
+    font-size: 1.2em;
+    font-weight: bold;
+    text-decoration: none;
+    width: 130px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    color: white;
+    border-radius: 4px;
+    margin-top: 20px;
+    margin-right: 20px;
 }

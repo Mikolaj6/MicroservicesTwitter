@@ -33,7 +33,7 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 // Constants for connections
-let redisServerHostname = 'users_redis'
+let redisServerHostname = 'redis'
 let redisServerPort = '6379'
 
 var registrationHandler = redis.createClient(redisServerPort, redisServerHostname);

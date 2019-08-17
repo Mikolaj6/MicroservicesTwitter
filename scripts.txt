@@ -4,7 +4,7 @@ docker rm $(docker ps -a -q -f status=exited)
 
 docker stop $(docker ps -a -q)
 
-docker exec -it users_redis bash
+docker exec -it redis bash
 
 //--------------------------------------------------------------
 // Setting up users
@@ -15,8 +15,8 @@ docker build -t mikolaj6/users . && docker run --rm --net newtwork-test --name u
 docker build -t mikolaj6/front_end . && docker run --rm --net newtwork-test -p 8888:3000 --name front_end mikolaj6/front_end
 
 
-// Seting up users_redis
-docker run --rm --net newtwork-test --name users_redis redis
+// Seting up redis
+docker run --rm --net newtwork-test --name redis redis
 
 //--------------------------------------------------------------
 // Useful docker compose commands
