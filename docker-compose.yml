@@ -6,17 +6,24 @@ services:
     ports:
       - 8888:3000
     depends_on:
-      - users_redis
+      - redis
     volumes:
       - ./FrontEnd/ServiceFrontEnd/views:/opt/servicefront/views
       - ./FrontEnd/ServiceFrontEnd/public/styles:/opt/servicefront/public/styles
+      - ./FrontEnd/ServiceFrontEnd/public/js:/opt/servicefront/public/js
 
   users:
     image: mikolaj6/users
     container_name: users
     depends_on:
-      - users_redis
+      - redis
   
-  users_redis:
+  posts:
+    image: mikolaj6/posts
+    container_name: posts
+    depends_on:
+      - redis
+
+  redis:
     image: redis
-    container_name: users_redis
+    container_name: redis

@@ -13,7 +13,6 @@ var app = express();
 
 app.use(cookieParser());
 
-
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 app.use(express.static(__dirname + '/public'));
@@ -35,17 +34,19 @@ app.use(bodyParser.json());
 
 // Constants for connections
 const usersServer = 'users:2000'
-const redisServerHostname = 'users_redis'
+const postsServer = 'posts:2000'
+const redisServerHostname = 'redis'
 const redisServerPort = '6379'
 const JWT_SECRET = "SHHHHHH"
 const JWT_EXPIRATION_SECONDS = 3600
+const POSTS_TIME_DIFF = 1000 * 120;
 
 // Constants for connections
-var registrationHandler = redis.createClient(redisServerPort, redisServerHostname);
+var mainHandler = redis.createClient(redisServerPort, redisServerHostname);
 
 
 //ROUTING
-registrationHandler.on('connect', function () {
+mainHandler.on('connect', function () {
     console.log('RegistrationHandler connected to Redis...');
 });
 
@@ -74,10 +75,65 @@ app.get('/logout', function (req, res) {
     res.redirect('login');
 });
 
+app.get('/resetDates', function (req, res) {
+    
+    if (req.session) {
+        req.session.starting = undefined
+        req.session.last = undefined
+        console.log("DEBUG: Reseted dates")
+    }
+
+    res.send();
+});
+
 app.get('/mainPage', verifyToken, csrfProtection, function (req, res) {
     console.log("DEBUG: Checking res.locals.username:" + res.locals.username)
 
     res.render('mainPage', { username: res.locals.username, csrfToken: req.csrfToken() });
+});
+
+app.get('/posts/refresh', verifyToken, async function (req, res) {
+    console.log("DEBUG: Currently displaying posts")
+    let tmp
+
+    if (!req.session.starting) {
+        console.log("DEBUG: THIS CODE SHOULD NOT EXECUTE")
+        return res.send();
+    } else {
+        tmp = req.session.starting
+        req.session.starting = Date.now()
+    }
+    
+    let responseProcessed = await requestPostsOfUser(res.locals.username, req.session.starting, tmp)
+
+    if (!responseProcessed) {
+        console.log("DEBUG: refresh responseProcessed empty")
+        return res.send();
+    } else {
+        return res.send(responseProcessed);
+    }
+});
+
+app.get('/posts/getMorePosts', verifyToken, async function (req, res) {
+    console.log("DEBUG: Currently displaying posts")
+
+    if(!req.session.last) {
+        req.session.starting = Date.now()
+        req.session.last = Date.now()
+        console.log("DEBUG: STRRTING:" + req.session.starting)
+    } else {
+        req.session.last -= POSTS_TIME_DIFF
+        console.log("DEBUG: AGAIN:" + req.session.last)
+    }
+
+    let responseProcessed = await requestPostsOfUser(res.locals.username, req.session.last, (req.session.last - POSTS_TIME_DIFF).toString())
+
+    if (!responseProcessed) {
+        console.log("DEBUG: getMorePosts responseProcessed empty")
+        return res.send();
+    } else {
+        return res.send(responseProcessed);
+    }
 });
 
 app.post('/dolog', parseForm, csrfProtection, function (req, res) {
@@ -122,13 +178,19 @@ app.post('/doreg', parseForm, csrfProtection, function (req, res) {
             return res.redirect('failedRegister')
         }
 
-        registrationHandler.publish("registration", "|USERNAME:" + req.body.nick + "|PASSWORD:" + req.body.password + "|");
+        mainHandler.publish("registration", "|USERNAME:" + req.body.nick + "|PASSWORD:" + req.body.password + "|");
         res.redirect('login')
     }
 });
 
-app.post('/newPost', parseForm, csrfProtection, function (req, res) {
-    console.log("DEBUG: added post of title: " + req.body.title + "|contents:" + req.body.contents + "|")
+app.post('/newPost', verifyToken, parseForm, csrfProtection, function (req, res) {    
+    if (!validateNewPost) {
+        console.log("DEBUG: Post invalid")
+    } else {
+        let date = Date.now()
+        mainHandler.publish("newPosts", res.locals.username + "|" + req.body.title + "|" + date + "|" + req.body.contents);
+    }
+    
     res.redirect('mainPage')
 });
 
@@ -203,4 +265,45 @@ function generateNewToken(userName, req) {
 
     req.session.token = newToken
     return true
+}
+
+function validateNewPost(newPostTitle, newPostContent) {
+    if (!newPostTitle || !newPostContent || newPostTitle.length === 0 || newPostContent.length === 0) {
+        return false;
+    } else {
+        if (newPostTitle.value.length >= 30) {
+            return false;
+        }
+        if (newPostContent.value.length >= 200) {
+            return false;
+        }
+        if (newPostContent.value.includes(';') || newPostContent.value.includes('|')) {
+            return false;
+        }
+        if (newPostTitle.value.includes(';') || newPostTitle.value.includes('|')) {
+            return false;
+        }
+
+        return true;
+    }
+}
+
+async function requestPostsOfUser(username, from, to) {
+    let response
+    try {
+        response = await fetch('http://' + postsServer + '/posts/' + username + '/' + from + '/' + to);
+    } catch (err) {
+        console.log("DEBUG: response empty, fetch failed")
+        return null
+    }
+
+    let responseProcessed
+    try {
+        responseProcessed = await response.json()
+    } catch (err) {
+        console.log("DEBUG: responseProcessed empty, json convertion failed")
+        return null
+    }
+
+    return responseProcessed
 }
