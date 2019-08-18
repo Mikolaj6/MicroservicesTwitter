@@ -42,13 +42,7 @@ registrationHandler.on('connect', function () {
     console.log('RegistrationHandler connected to Redis...');
 });
 
-let usersDb = new sqlite3.Database('UsersDb');
-
-// Temporary database initialization
-usersDb.serialize(() => {
-    usersDb.run('DROP TABLE IF EXISTS userData;');
-    usersDb.run('CREATE TABLE userData (username varchar(30), password varchar(30));');
-});
+let usersDb = new sqlite3.Database('commonDb.db');
 
 // ROUTING
 app.get('/login/:nick/:password', async function (req, res) {
@@ -76,7 +70,7 @@ registrationHandler.on("message", async function (channel, registrationData) {
     let registerNewUser = `INSERT INTO userData(username, password) VALUES(?, ?)`;
     let sqlIsSuchUser = `SELECT username User FROM userData WHERE username = ?`;
 
-    let tmpDB = new sqlite3.Database('UsersDb')
+    let tmpDB = new sqlite3.Database('commonDb.db')
 
     if (!await sqlCmdRun(tmpDB, 'BEGIN TRANSACTION', [])) {
         return

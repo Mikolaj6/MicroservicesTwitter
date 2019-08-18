@@ -35,11 +35,12 @@ app.use(bodyParser.json());
 // Constants for connections
 const usersServer = 'users:2000'
 const postsServer = 'posts:2000'
+const relationsServer = 'relations:2000'
 const redisServerHostname = 'redis'
 const redisServerPort = '6379'
 const JWT_SECRET = "SHHHHHH"
 const JWT_EXPIRATION_SECONDS = 3600
-const POSTS_TIME_DIFF = 1000 * 120;
+const POSTS_TIME_DIFF = 1000 * 240;
 
 // Constants for connections
 var mainHandler = redis.createClient(redisServerPort, redisServerHostname);
@@ -114,6 +115,15 @@ app.get('/posts/refresh', verifyToken, async function (req, res) {
     }
 });
 
+app.get('/myObserved', verifyToken, async function (req, res) {
+    console.log("DEBUG: Asked for observed by:" + res.locals.username)
+    let tmp
+
+    let response = await requestObservedByUser(res.locals.username)
+
+    res.send(response);
+});
+
 app.get('/posts/getMorePosts', verifyToken, async function (req, res) {
     console.log("DEBUG: Currently displaying posts")
 
@@ -183,14 +193,25 @@ app.post('/doreg', parseForm, csrfProtection, function (req, res) {
     }
 });
 
-app.post('/newPost', verifyToken, parseForm, csrfProtection, function (req, res) {    
-    if (!validateNewPost) {
+app.post('/newPost', verifyToken, parseForm, csrfProtection, function (req, res) {
+
+    if (!validateNewPost(req.body.title, req.body.contents)) {
         console.log("DEBUG: Post invalid")
     } else {
         let date = Date.now()
         mainHandler.publish("newPosts", res.locals.username + "|" + req.body.title + "|" + date + "|" + req.body.contents);
     }
     
+    res.redirect('mainPage')
+});
+
+app.post('/newObserved', verifyToken, parseForm, csrfProtection, function (req, res) {
+    if (!validateUsername(req.body.userObserved)) {
+        console.log("DEBUG: Observation invalid")
+    } else {
+        mainHandler.publish("newObservations", res.locals.username + "|" + req.body.userObserved);
+    }
+
     res.redirect('mainPage')
 });
 
@@ -247,6 +268,14 @@ function validateUsernameAndPassword(username: string, password: string) {
     }
 }
 
+function validateUsername(username: string) {
+    if (username.match("^[A-z0-9*!]+$") && username.length <= 30 && username.length >= 4) {
+        return true
+    } else {
+        return false
+    }
+}
+
 // Returns true when token was succesfully generated, false otherwise
 function generateNewToken(userName, req) {
     let newToken
@@ -268,19 +297,20 @@ function generateNewToken(userName, req) {
 }
 
 function validateNewPost(newPostTitle, newPostContent) {
+
     if (!newPostTitle || !newPostContent || newPostTitle.length === 0 || newPostContent.length === 0) {
         return false;
     } else {
-        if (newPostTitle.value.length >= 30) {
+        if (newPostTitle.length >= 30) {
             return false;
         }
-        if (newPostContent.value.length >= 200) {
+        if (newPostContent.length >= 200) {
             return false;
         }
-        if (newPostContent.value.includes(';') || newPostContent.value.includes('|')) {
+        if (newPostContent.includes(';') || newPostContent.includes('|')) {
             return false;
         }
-        if (newPostTitle.value.includes(';') || newPostTitle.value.includes('|')) {
+        if (newPostTitle.includes(';') || newPostTitle.includes('|')) {
             return false;
         }
 
@@ -292,6 +322,26 @@ async function requestPostsOfUser(username, from, to) {
     let response
     try {
         response = await fetch('http://' + postsServer + '/posts/' + username + '/' + from + '/' + to);
+    } catch (err) {
+        console.log("DEBUG: response empty, fetch failed")
+        return null
+    }
+
+    let responseProcessed
+    try {
+        responseProcessed = await response.json()
+    } catch (err) {
+        console.log("DEBUG: responseProcessed empty, json convertion failed")
+        return null
+    }
+
+    return responseProcessed
+}
+
+async function requestObservedByUser(username) {
+    let response
+    try {
+        response = await fetch('http://' + relationsServer + '/observing/' + username);
     } catch (err) {
         console.log("DEBUG: response empty, fetch failed")
         return null

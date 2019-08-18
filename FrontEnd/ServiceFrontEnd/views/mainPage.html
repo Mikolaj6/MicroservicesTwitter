@@ -11,75 +11,123 @@
 
 <body>
 
-        <a href="/logout" class="logout"> Logout </a>
-    
-        <h1 id="Welcome"> Welcome <%= username %> </h1>
+    <a href="/logout" class="logout"> Logout </a>
 
-        <div id="options">
-            <h2 id="newPost" class="btn blue">Write post</h2>
+    <h1 id="Welcome"> Welcome <%= username %> </h1>
 
-            <h2 id="feed" class="btn green">Your feed</h2>
+    <div id="options">
+        <h2 id="newPost" class="btn blue">Write post</h2>
 
-            <h2 id="yourPosts" class="btn green">Your posts</h2>
+        <h2 id="feed" class="btn green">Your feed</h2>
 
-            <h2 id="friends" class="btn blue">Checkout friends!!!</h2>
+        <h2 id="yourPosts" class="btn green">Your posts</h2>
+
+        <h2 id="friends" class="btn blue">Checkout friends!!!</h2>
+    </div>
+
+    <div id="newPostPopup" class="popup">
+
+        <div class="popup-overlay">
+            <span class="close">&times;</span>
+
+            <h3 class="headersInPopups"> Write and post whatever you want!!! </h3>
+
+            <form id="newPost" method="POST" onsubmit="return newPostValidate()" action="/newPost"
+                encType="multipart/form-data">
+                <div>
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <p id="newPostTitleWord" class="postLabel">Title:</p>
+                    <input id='newPostTitle' type="text" name="title" class="postInputField">
+                    <p id="newPostTitleWord" class="postLabel">Contents:</p>
+                    <textarea id="newPostContent" name="contents" class="postInputField"></textarea>
+                    <input id='newPostSubmit' type="submit" value="Post" class="btn blue">
+                </div>
+            </form>
         </div>
+    </div>
 
-        <div id="newPostPopup" class="popup">
-        
-            <div class="popup-overlay">
-                <span class="close">&times;</span>
-                
-                <h3 class="headersInPopups"> Write and post whatever you want!!! </h3>
-                
-                <form id="newPost" method="POST" onsubmit="return newPostValidate()" action="/newPost" encType="multipart/form-data">
-                    <div>
-                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                        <p id="newPostTitleWord" class="postLabel">Title:</p>
-                        <input id='newPostTitle' type="text" name="title" class="postInputField">
-                        <p id="newPostTitleWord" class="postLabel">Contents:</p>
-                        <textarea id="newPostContent" name="contents" class="postInputField"></textarea>
-                        <input id='newPostSubmit' type="submit" value="Post" class="btn blue">
-                    </div>
-                </form>
+    <div id="feedPopup" class="popup">
+
+        <div class="popup-overlay">
+            <span class="close">&times;</span>
+
+            <p id="loadOlderFeed" class="buttonReload green"> Load older </p>
+            <p id="refreshFeed" class="buttonReload blue"> Refresh </p>
+
+            <h3 class="headersInPopups"> Your feed </h3>
+
+            <ul id="postListFeed">
+
+            </ul>
+        </div>
+    </div>
+
+    <div id="yourPostsPopup" class="popup">
+
+        <div class="popup-overlay">
+            <span class="close">&times;</span>
+
+            <p id="loadOlder" class="buttonReload green"> Load older </p>
+            <p id="refresh" class="buttonReload blue"> Refresh </p>
+
+            <h3 class="headersInPopups"> Your posts </h3>
+
+            <ul id="postList">
+
+            </ul>
+        </div>
+    </div>
+
+    <div id="friendsPopup" class="popup">
+
+        <div class="popup-overlay">
+            <span class="close">&times;</span>
+            <div id="friendsGridManager">
+
+                <div id="observed">
+
+                    <h3 class="headersInPopups"> Observed users: </h3>
+
+                    <ul id="observedList">
+
+                    </ul>
+                </div>
+
+                <div id="addNewObserved">
+
+                    <h3 class="headersInPopups"> Add new user to be observed !!! </h3>
+
+                    <form id="NewObserved" method="POST" onsubmit="return newObservedValidate()" action="/newObserved"
+                        encType="multipart/form-data">
+                        <div>
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <input id='newObservedName' type="text" name="userObserved" class="postInputField">
+                            <input id='newObservedSubmit' type="submit" value="Observe" class="btn blue">
+                        </div>
+                    </form>
+                </div>
             </div>
-        </div>
 
-        <div id="feedPopup" class="popup">
-        
-            <div class="popup-overlay">
-                <span class="close">&times;</span>
-        
-                <h3> TESTING feed </h3>
-            </div>
         </div>
+    </div>
 
-        <div id="yourPostsPopup" class="popup">
-        
-            <div class="popup-overlay">
-                <span class="close">&times;</span>
-                
-                <p id="loadOlder" class="buttonLeft green"> Load older </p>
-                <p id="refresh" class="buttonLeft blue"> Refresh </p>
+    <div id="friendPostsPopup" class="popup">
 
-                <h3 class="headersInPopups"> Your posts </h3>
-                
-                <ul id="postList">
+        <div class="popup-overlay-friends">
+            <span class="close">&times;</span>
 
-                </ul>
-            </div>
+            <p id="loadOlderFriend" class="buttonReload green"> Load older </p>
+            <p id="refreshFriend" class="buttonReload blue"> Refresh </p>
+
+            <h3 id="FriendFeedHeader" class="headersInPopups"> This is USERX feed </h3>
+
+            <ul id="postListFriend">
+
+            </ul>
         </div>
-        
-        <div id="friendsPopup" class="popup">
-        
-            <div class="popup-overlay">
-                <span class="close">&times;</span>
-        
-                <h3> TESTING friends </h3>
-            </div>
-        </div>
-        
-        <script src="js/mainPage.js"></script>
+    </div>
+
+    <script src="js/mainPage.js"></script>
 </body>
 
 

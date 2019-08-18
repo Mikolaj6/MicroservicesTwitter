@@ -230,7 +230,7 @@ body {
     right: 185px;
 }
 
-.buttonLeft {
+.buttonReload {
     position: absolute;
     top: 0px;
     font-size: 1.2em;
@@ -243,4 +243,41 @@ body {
     border-radius: 4px;
     margin-top: 20px;
     margin-right: 20px;
+}
+
+/* ---------------FRIENDS--------------- */
+
+#friendsGridManager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "LEFT RIGHT";
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+}
+
+#observed {
+    grid-area: LEFT;
+}
+
+#addNewObserved {
+    grid-area: RIGHT;
+}
+
+#newObservedName {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+    margin-bottom: 25px;
+    width: 60%;
+}
+
+/* -------------FRIENDS FEED------------- */
+
+#loadOlderFeed {
+    right: 30px;
+}
+
+#refreshFeed {
+    right: 185px;
 }

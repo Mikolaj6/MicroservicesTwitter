@@ -1,7 +1,8 @@
 version: "3"
 services:
   front_end:
-    image: mikolaj6/front_end
+    build: ./FrontEnd
+    image: front_end
     container_name: front_end
     ports:
       - 8888:3000
@@ -13,16 +14,31 @@ services:
       - ./FrontEnd/ServiceFrontEnd/public/js:/opt/servicefront/public/js
 
   users:
-    image: mikolaj6/users
+    build: ./Users
+    image: users
     container_name: users
     depends_on:
       - redis
+    volumes:
+      - ./commonDb.db:/opt/users/commonDb.db
   
   posts:
-    image: mikolaj6/posts
+    build: ./Posts
+    image: posts
     container_name: posts
     depends_on:
       - redis
+    volumes:
+      - ./commonDb.db:/opt/posts/commonDb.db
+
+  relations:
+    build: ./Relations
+    image: relations
+    container_name: relations
+    depends_on:
+      - redis
+    volumes:
+      - ./commonDb.db:/opt/relations/commonDb.db
 
   redis:
     image: redis

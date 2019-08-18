@@ -42,13 +42,7 @@ registrationHandler.on('connect', function () {
     console.log('NewPostsHandler connected to Redis...');
 });
 
-let usersDb = new sqlite3.Database('PostsDb');
-
-// Temporary database initialization
-usersDb.serialize(() => {
-    usersDb.run('DROP TABLE IF EXISTS posts;');
-    usersDb.run('CREATE TABLE posts (creator varchar(30), title varchar(30), date INTEGER, contents varchar(220));');
-});
+let usersDb = new sqlite3.Database('commonDb.db');
 
 // ROUTING
 app.get('/posts/:user/:from/:to/', async function (req, res) {

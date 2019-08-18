@@ -66,6 +66,7 @@ yourPosts.onclick = async function () {
 
 friends.onclick = function () {
     friendsPopup.style.display = "block";
+    getObservedUsers()
 }
 
 // Refresh and Load more for user
@@ -188,4 +189,31 @@ function buildUserPosts(response, append: boolean): void {
             postList.prepend(node);
         }
     }
+}
+
+function newObservedValidate() {
+    let newObservedName = document.getElementById('newObservedName') as HTMLInputElement
+    let username = newObservedName.value
+    
+    if (!username) {
+        return false
+    }
+
+    if (username.match("^[A-z0-9*!]+$") && username.length <= 30 && username.length >= 4) {
+        return true
+    } else {
+        return false
+    }
+    
+}
+
+async function getObservedUsers() {
+    let response
+    try {
+        let res = await fetch('/myObserved');
+        response = await res.json();
+    } catch (err) {
+        console.log("ERROR getObservedUsers")
+    }
+    console.log(response)
 }

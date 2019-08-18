@@ -1,3 +1,4 @@
-*.js
 node_modules/
 compileAll.sh
+commonDb/
+commonDb.db
