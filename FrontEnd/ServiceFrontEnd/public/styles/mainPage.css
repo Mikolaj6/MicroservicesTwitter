@@ -192,7 +192,7 @@ body {
 
 /* -------- Show your posts handling --------- */
 
-#postList {
+.list {
     text-align: left;
     list-style: none;
 }
@@ -279,5 +279,31 @@ body {
 }
 
 #refreshFeed {
+    right: 185px;
+}
+
+.users {
+    margin-top: 8px;
+    font-size: 1.8em;
+    margin-left: 0px;
+    color: #110ee7;
+    text-align: center;
+}
+
+#observedList {
+    padding: 0;
+    list-style-type: none;
+    list-style: none;
+}
+
+#friendPostsPopup {
+    z-index: 2;
+}
+
+#loadOlderFriend {
+    right: 30px;
+}
+
+#refreshFriend {
     right: 185px;
 }

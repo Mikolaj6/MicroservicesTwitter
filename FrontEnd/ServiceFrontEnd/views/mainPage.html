@@ -11,6 +11,8 @@
 
 <body>
 
+    <input id="usernameVal" type="hidden" value="<%= username %>">
+
     <a href="/logout" class="logout"> Logout </a>
 
     <h1 id="Welcome"> Welcome <%= username %> </h1>
@@ -22,7 +24,7 @@
 
         <h2 id="yourPosts" class="btn green">Your posts</h2>
 
-        <h2 id="friends" class="btn blue">Checkout friends!!!</h2>
+        <h2 id="friends" class="btn blue">Your observed</h2>
     </div>
 
     <div id="newPostPopup" class="popup">
@@ -56,7 +58,7 @@
 
             <h3 class="headersInPopups"> Your feed </h3>
 
-            <ul id="postListFeed">
+            <ul id="postListFeed" class="list">
 
             </ul>
         </div>
@@ -72,7 +74,7 @@
 
             <h3 class="headersInPopups"> Your posts </h3>
 
-            <ul id="postList">
+            <ul id="postList" class="list">
 
             </ul>
         </div>
@@ -88,7 +90,7 @@
 
                     <h3 class="headersInPopups"> Observed users: </h3>
 
-                    <ul id="observedList">
+                    <ul id="observedList" class="list">
 
                     </ul>
                 </div>
@@ -113,7 +115,7 @@
 
     <div id="friendPostsPopup" class="popup">
 
-        <div class="popup-overlay-friends">
+        <div class="popup-overlay">
             <span class="close">&times;</span>
 
             <p id="loadOlderFriend" class="buttonReload green"> Load older </p>
@@ -121,8 +123,10 @@
 
             <h3 id="FriendFeedHeader" class="headersInPopups"> This is USERX feed </h3>
 
-            <ul id="postListFriend">
+            <input id="observedName" type="hidden" value="">
 
+            <ul id="postListFriend" class="list">
+                
             </ul>
         </div>
     </div>

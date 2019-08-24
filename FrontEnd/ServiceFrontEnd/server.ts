@@ -40,7 +40,7 @@ const redisServerHostname = 'redis'
 const redisServerPort = '6379'
 const JWT_SECRET = "SHHHHHH"
 const JWT_EXPIRATION_SECONDS = 3600
-const POSTS_TIME_DIFF = 1000 * 240;
+const POSTS_TIME_DIFF = 1000 * 3600 * 1;
 
 // Constants for connections
 var mainHandler = redis.createClient(redisServerPort, redisServerHostname);
@@ -71,16 +71,15 @@ app.get('/unauthorized', function (req, res) {
     res.render('unauthorized');
 });
 
-app.get('/logout', function (req, res) {
+app.get('/logout', verifyToken, function (req, res) {
     req.session.destroy();
     res.redirect('login');
 });
 
-app.get('/resetDates', function (req, res) {
+app.get('/resetDatesOnYourPosts', verifyToken, function (req, res) {
     
-    if (req.session) {
-        req.session.starting = undefined
-        req.session.last = undefined
+    if (req.session.users) {
+        req.session.users = {}
         console.log("DEBUG: Reseted dates")
     }
 
@@ -93,19 +92,22 @@ app.get('/mainPage', verifyToken, csrfProtection, function (req, res) {
     res.render('mainPage', { username: res.locals.username, csrfToken: req.csrfToken() });
 });
 
-app.get('/posts/refresh', verifyToken, async function (req, res) {
+app.get('/posts/refresh/:user', verifyToken, async function (req, res) {
     console.log("DEBUG: Currently displaying posts")
     let tmp
 
-    if (!req.session.starting) {
-        console.log("DEBUG: THIS CODE SHOULD NOT EXECUTE")
+    if(!req.params.user) {
+        console.log('DEBUG: ERROR user undefined')
         return res.send();
-    } else {
-        tmp = req.session.starting
-        req.session.starting = Date.now()
+    }
+
+    tmp = refreshUpdatePostRequestTimes(req.params.user, req.session)
+    if(!tmp) {
+        return res.send();
     }
     
-    let responseProcessed = await requestPostsOfUser(res.locals.username, req.session.starting, tmp)
+    let request = 'http://' + postsServer + '/posts/' + req.params.user + '/' + req.session.users[req.params.user].starting + '/' + tmp
+    let responseProcessed = await doRequest(request)
 
     if (!responseProcessed) {
         console.log("DEBUG: refresh responseProcessed empty")
@@ -117,29 +119,28 @@ app.get('/posts/refresh', verifyToken, async function (req, res) {
 
 app.get('/myObserved', verifyToken, async function (req, res) {
     console.log("DEBUG: Asked for observed by:" + res.locals.username)
-    let tmp
 
-    let response = await requestObservedByUser(res.locals.username)
+    let request = 'http://' + relationsServer + '/observing/' + res.locals.username
+    let response = await doRequest(request)
 
     res.send(response);
 });
 
-app.get('/posts/getMorePosts', verifyToken, async function (req, res) {
+app.get('/posts/getMorePosts/:user', verifyToken, async function (req, res) {
     console.log("DEBUG: Currently displaying posts")
 
-    if(!req.session.last) {
-        req.session.starting = Date.now()
-        req.session.last = Date.now()
-        console.log("DEBUG: STRRTING:" + req.session.starting)
-    } else {
-        req.session.last -= POSTS_TIME_DIFF
-        console.log("DEBUG: AGAIN:" + req.session.last)
+    if (!req.params.user) {
+        console.log('DEBUG: ERROR user undefined')
+        return res.send();
     }
 
-    let responseProcessed = await requestPostsOfUser(res.locals.username, req.session.last, (req.session.last - POSTS_TIME_DIFF).toString())
+    getMoreUpdatePostRequestTimes(req.params.user, req.session);
+
+    let request = 'http://' + postsServer + '/posts/' + req.params.user + '/' + req.session.users[req.params.user].last + '/' + (req.session.users[req.params.user].last - POSTS_TIME_DIFF).toString()
+    let responseProcessed = await doRequest(request);
 
     if (!responseProcessed) {
-        console.log("DEBUG: getMorePosts responseProcessed empty")
+        console.log("DEBUG: getMorePosts responseProcessed empty");
         return res.send();
     } else {
         return res.send(responseProcessed);
@@ -206,7 +207,7 @@ app.post('/newPost', verifyToken, parseForm, csrfProtection, function (req, res)
 });
 
 app.post('/newObserved', verifyToken, parseForm, csrfProtection, function (req, res) {
-    if (!validateUsername(req.body.userObserved)) {
+    if (!validateUsername(req.body.userObserved) || res.locals.username === req.body.userObserved) {
         console.log("DEBUG: Observation invalid")
     } else {
         mainHandler.publish("newObservations", res.locals.username + "|" + req.body.userObserved);
@@ -318,10 +319,10 @@ function validateNewPost(newPostTitle, newPostContent) {
     }
 }
 
-async function requestPostsOfUser(username, from, to) {
+async function doRequest(request) {
     let response
     try {
-        response = await fetch('http://' + postsServer + '/posts/' + username + '/' + from + '/' + to);
+        response = await fetch(request);
     } catch (err) {
         console.log("DEBUG: response empty, fetch failed")
         return null
@@ -338,22 +339,40 @@ async function requestPostsOfUser(username, from, to) {
     return responseProcessed
 }
 
-async function requestObservedByUser(username) {
-    let response
-    try {
-        response = await fetch('http://' + relationsServer + '/observing/' + username);
-    } catch (err) {
-        console.log("DEBUG: response empty, fetch failed")
-        return null
+// Returns null when error occured and no request should be made
+function refreshUpdatePostRequestTimes(userName, session) {
+    if (!session.users) {
+        session.users = {};
+    }
+    if (!session.users[userName]) {
+        session.users[userName] = {};
+    }
+    if (!session.users[userName].starting) {
+        console.log("DEBUG: THIS CODE SHOULD NOT EXECUTE")
+        return null;
+    } else {
+        let tmp = session.users[userName].starting
+        session.users[userName].starting = Date.now()
+        return tmp;
+    }
+}
+
+function getMoreUpdatePostRequestTimes(userName, session) {
+    if (!session.users) {
+        session.users = {};
+        console.log("DEBUG: creating and array")
+    }
+    if (!session.users[userName]) {
+        console.log("DEBUG: creating object for " + userName)
+        session.users[userName] = {};
     }
 
-    let responseProcessed
-    try {
-        responseProcessed = await response.json()
-    } catch (err) {
-        console.log("DEBUG: responseProcessed empty, json convertion failed")
-        return null
+    if (!session.users[userName].last) {
+        session.users[userName].starting = Date.now()
+        session.users[userName].last = Date.now()
+        console.log("DEBUG: STARTING:" + session.users[userName].starting)
+    } else {
+        session.users[userName].last -= POSTS_TIME_DIFF
+        console.log("DEBUG: AGAIN:" + session.users[userName].last)
     }
-
-    return responseProcessed
 }

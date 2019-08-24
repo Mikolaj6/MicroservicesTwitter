@@ -68,38 +68,18 @@ registrationHandler.on("message", async function (channel, registrationData) {
     }
 
     let registerNewUser = `INSERT INTO userData(username, password) VALUES(?, ?)`;
-    let sqlIsSuchUser = `SELECT username User FROM userData WHERE username = ?`;
-
-    let tmpDB = new sqlite3.Database('commonDb.db')
-
-    if (!await sqlCmdRun(tmpDB, 'BEGIN TRANSACTION', [])) {
-        return
-    }
-
-    console.log("DEBUG: IN BEGIN TRANSACTION")
-
-    let val = await sqlCmdGet(tmpDB, sqlIsSuchUser, [username])
-    if (!val[0]) {
-        return await sqlCmdRun(tmpDB, 'ROLLBACK', [])
-    } else {
-        if (val[1]) {
-            console.log("DEBUG: Already such user row:" + (val[1] as any).User + " val[1]: " + val[1])
-            return await sqlCmdRun(tmpDB, 'ROLLBACK', [])
-        }
-    }
 
     console.log("DEBUG: BEGINING HASHING PASSWORD")
     let hashedPassword = await hashPassword(password)
     if (hashedPassword === null) {
-        return await sqlCmdRun(tmpDB, 'ROLLBACK', [])
+        return console.log("DEBUG: ERROR HASHING PASSWORD")
     }
 
-    if (!await sqlCmdRun(tmpDB, registerNewUser, [username, hashedPassword])) {
-        return await sqlCmdRun(tmpDB, 'ROLLBACK', [])
+    if (!await sqlCmdRun(usersDb, registerNewUser, [username, hashedPassword])) {
+        return console.log("DEBUG: FAILED ADDING USER")
     }
 
-    console.log("DEBUG: JUST BEFORE COMMIT")
-    return await sqlCmdRun(tmpDB, 'COMMIT', [])
+    console.log("DEBUG: ADDED USER SUCCESSFULLY")
 });
 
 registrationHandler.subscribe("registration");

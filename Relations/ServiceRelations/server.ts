@@ -43,13 +43,18 @@ app.get('/observing/:user', async function (req, res) {
 
 relationsHandler.on("message", async function (channel, observationData) {
     console.log("DEBUG: Received registration request chanel:" + channel + "|observationData:" + observationData)
-    // First validate received string
 
     var postArr = observationData.split('|');
 
-    let sql = 'INSERT INTO relations(observer, observed) VALUES (?, ?)';
+    let sqlSelect = "SELECT username FROM userData WHERE username = ?"
+    let sqlInsert = 'INSERT INTO relations(observer, observed) VALUES (?, ?)';
 
-    sqlCmdRun(relationsDb, sql, [postArr[0], postArr[1]]);
+    let result = await sqlCmdAll(relationsDb, sqlSelect, [postArr[1]]);
+    if (!result || !result[0] || !Array.isArray(result[1]) || (result[1] as Array<String>).length != 1) {
+        console.log("DEBUG: error/user wasn't correct")
+    } else {
+        sqlCmdRun(relationsDb, sqlInsert, [postArr[0], postArr[1]]);
+    }
 });
 
 relationsHandler.subscribe("newObservations");
