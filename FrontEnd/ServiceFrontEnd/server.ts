@@ -40,7 +40,7 @@ const redisServerHostname = 'redis'
 const redisServerPort = '6379'
 const JWT_SECRET = "SHHHHHH"
 const JWT_EXPIRATION_SECONDS = 3600
-const POSTS_TIME_DIFF = 1000 * 3600 * 1;
+const POSTS_TIME_DIFF = 1000 * 3600 * 24;
 
 // Constants for connections
 var mainHandler = redis.createClient(redisServerPort, redisServerHostname);
@@ -93,7 +93,7 @@ app.get('/mainPage', verifyToken, csrfProtection, function (req, res) {
 });
 
 app.get('/posts/refresh/:user', verifyToken, async function (req, res) {
-    console.log("DEBUG: Currently displaying posts")
+    console.log("DEBUG: CurrentlrefreshUpdatePostRequestTimesy displaying posts")
     let tmp
 
     if(!req.params.user) {
@@ -144,6 +144,26 @@ app.get('/posts/getMorePosts/:user', verifyToken, async function (req, res) {
         return res.send();
     } else {
         return res.send(responseProcessed);
+    }
+});
+
+app.get('/refreshFeed', verifyToken, async function (req, res) {
+    console.log("DEBUG: request for older feed")
+    let result = await getMoreFeedOrRefresh(req, res, true);
+    if (!result) {
+        res.send()
+    } else {
+        res.send(result)
+    }
+});
+
+app.get('/getOlderFeed', verifyToken, async function (req, res) {
+    console.log("DEBUG: request for more feed")
+    let result = await getMoreFeedOrRefresh(req, res, false);
+    if(!result) {
+        res.send()
+    } else {
+        res.send(result)
     }
 });
 
@@ -375,4 +395,45 @@ function getMoreUpdatePostRequestTimes(userName, session) {
         session.users[userName].last -= POSTS_TIME_DIFF
         console.log("DEBUG: AGAIN:" + session.users[userName].last)
     }
+}
+
+async function getMoreFeedOrRefresh(req, res, refresh) {
+    let request = 'http://' + relationsServer + '/observing/' + res.locals.username
+    let response = await doRequest(request)
+
+    if (!response)
+        return null;
+
+    let finalResponse = []
+
+    for (let elem in response) {
+        let observed = response[elem].observed
+        console.log("DEBUG: Currently building feed from " + observed)
+
+        let request
+        if (!refresh){
+            getMoreUpdatePostRequestTimes(observed, req.session);
+            request = 'http://' + postsServer + '/posts/' + observed + '/' + req.session.users[observed].last + '/' + (req.session.users[observed].last - POSTS_TIME_DIFF).toString()
+        } else {
+            let tmp = refreshUpdatePostRequestTimes(observed, req.session)
+            if (!tmp) {
+                return null;
+            }
+            request = 'http://' + postsServer + '/posts/' + observed + '/' + req.session.users[observed].starting + '/' + tmp
+        }
+
+        let responseProcessed = await doRequest(request);
+
+        for (let postIdx in responseProcessed) {
+            responseProcessed[postIdx].observed = response[elem].observed
+        }
+        finalResponse.push(...responseProcessed)
+    }
+
+    finalResponse.sort(function (a, b) { 
+        return b.date - a.date;
+    });
+
+    console.log("DEBUG: finalResponse: %j", finalResponse);
+    return finalResponse;
 }

@@ -21,9 +21,10 @@ let friends = document.getElementById('friends');
 
 let loadOlder = document.getElementById('loadOlder');
 let refresh = document.getElementById('refresh');
-
 let loadOlderFriend = document.getElementById('loadOlderFriend');
 let refreshFriend = document.getElementById('refreshFriend');
+let loadOlderFeed = document.getElementById('loadOlderFeed');
+let refreshFeed = document.getElementById('refreshFeed');
 
 // Usernames
 let observedName = document.getElementById('observedName') as HTMLInputElement;
@@ -67,6 +68,7 @@ friendsPostsClose.onclick = function () {
 window.onclick = function (event) {
     if (event.target == friendPostsPopup) {
         friendPostsPopup.style.display = "none";
+        doFetch('/resetDatesOnYourPosts')
     } else if (event.target == newPostPopup || event.target == feedPopup || event.target == yourPostsPopup || event.target == friendsPopup) {
         newPostPopup.style.display = "none";
         feedPopup.style.display = "none";
@@ -85,6 +87,7 @@ newPost.onclick = function () {
 }
 
 feed.onclick = function () {
+    showFeed(true);
     feedPopup.style.display = "block";
 }
 
@@ -146,6 +149,16 @@ refreshFriend.onclick = async function() {
         return
 
     buildUserPosts(response, false, observedName.value, postListFriend)
+}
+
+// Handle your feed 
+
+loadOlderFeed.onclick = async function()  {
+    showFeed(true);
+}
+
+refreshFeed.onclick = async function () {
+    showFeed(false);
 }
 
 // Send new Post
@@ -212,11 +225,12 @@ function buildUserPosts(response, append: boolean, username: string, list): void
 
         let node = document.createElement("LI");
 
-        if (username) {
+        if (username || response[idxActual]['observed']) {
+            let actualUsername = username ? username : response[idxActual]['observed']; 
             let usernameElem = document.createElement("h3");
             usernameElem.classList.add('TitleAndName');
             usernameElem.classList.add('postsHeaders');
-            usernameElem.innerHTML = username + ":"
+            usernameElem.innerHTML = actualUsername + ":"
             node.appendChild(usernameElem);
         }
 
@@ -294,4 +308,26 @@ async function showFriend(friendName: string) {
         return
 
     buildUserPosts(response, true, friendName, postListFriend)
+}
+
+async function showFeed(getOlder: boolean) {
+    let request
+
+    if (getOlder) {
+        request = '/getOlderFeed'
+    } else {
+        request = '/refreshFeed'
+    }
+    
+    let response = await doFetch(request)
+
+    if(!response) {
+        return console.log("DEBUG: Response was empty")
+    }
+
+    if (getOlder) {
+        buildUserPosts(response, true, null, postListFeed)
+    } else {
+        buildUserPosts(response, false, null, postListFeed)
+    }
 }
