@@ -77,7 +77,7 @@ app.get('/logout', verifyToken, function (req, res) {
 });
 
 app.get('/resetDatesOnYourPosts', verifyToken, function (req, res) {
-    
+
     if (req.session.users) {
         req.session.users = {}
         console.log("DEBUG: Reseted individual dates")
@@ -102,16 +102,16 @@ app.get('/posts/refresh/:user', verifyToken, async function (req, res) {
     console.log("DEBUG: CurrentlrefreshUpdatePostRequestTimesy displaying posts")
     let tmp
 
-    if(!req.params.user) {
+    if (!req.params.user) {
         console.log('DEBUG: ERROR user undefined')
         return res.send();
     }
 
     tmp = refreshUpdatePostRequestTimes(req.params.user, req.session)
-    if(!tmp) {
+    if (!tmp) {
         return res.send();
     }
-    
+
     let request = 'http://' + postsServer + '/posts/' + req.params.user + '/' + req.session.users[req.params.user].starting + '/' + tmp
     let responseProcessed = await doRequest(request)
 
@@ -166,7 +166,7 @@ app.get('/refreshFeed', verifyToken, async function (req, res) {
 app.get('/getOlderFeed', verifyToken, async function (req, res) {
     console.log("DEBUG: request for more feed")
     let result = await getMoreFeedOrRefresh(req, res, false);
-    if(!result) {
+    if (!result) {
         res.send()
     } else {
         res.send(result)
@@ -191,11 +191,11 @@ app.post('/dolog', parseForm, csrfProtection, function (req, res) {
             if (response['loginStatus'] == true) {
                 console.log('DEBUG: Begining generating token')
 
-                if(!generateNewToken(req.body.nick, req)) {
+                if (!generateNewToken(req.body.nick, req)) {
                     console.log('DEBUG: failuresigning the token')
                     return res.redirect('failedLogin')
                 }
-                
+
                 console.log('DEBUG: loggin success and token created token:' + req.session.token)
                 return res.redirect('mainPage')
             } else {
@@ -228,7 +228,7 @@ app.post('/newPost', verifyToken, parseForm, csrfProtection, function (req, res)
         let date = Date.now()
         mainHandler.publish("newPosts", res.locals.username + "|" + req.body.title + "|" + date + "|" + req.body.contents);
     }
-    
+
     res.redirect('mainPage')
 });
 
@@ -261,7 +261,7 @@ function verifyToken(req, res, next) {
             console.log("DEBUG: Error generating new token in middleware")
             return res.redirect('unauthorized')
         }
-        res.locals.username = decoded.username;  
+        res.locals.username = decoded.username;
     } catch (err) {
         console.log("DEBUG: Error decoding token")
         console.log(err.message)
@@ -425,7 +425,7 @@ function feedTimesLoadMoreUserPosts(userName, session) {
         session.usersFeed.users = {};
         console.log("DEBUG: creating and array")
     }
-    
+
     if (!session.usersFeed.last) {
         session.usersFeed.starting = Date.now()
         session.usersFeed.last = Date.now()
@@ -471,7 +471,7 @@ async function getMoreFeedOrRefresh(req, res, refresh: boolean) {
     let finalResponse = []
     let newStartingTime
 
-    if(refresh) {
+    if (refresh) {
         newStartingTime = Date.now()
     }
 
@@ -480,7 +480,7 @@ async function getMoreFeedOrRefresh(req, res, refresh: boolean) {
         console.log("DEBUG: Currently building feed from " + observed)
 
         let request
-        if (!refresh){
+        if (!refresh) {
             let times = feedTimesLoadMoreUserPosts(observed, req.session);
             request = 'http://' + postsServer + '/posts/' + observed + '/' + times[0] + '/' + times[1]
         } else {
@@ -505,7 +505,7 @@ async function getMoreFeedOrRefresh(req, res, refresh: boolean) {
         incrementLast(req.session)
     }
 
-    finalResponse.sort(function (a, b) { 
+    finalResponse.sort(function (a, b) {
         return b.date - a.date;
     });
 

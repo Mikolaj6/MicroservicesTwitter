@@ -125,10 +125,10 @@ loadOlder.onclick = async function () {
 
 refresh.onclick = async function () {
     let response = await doFetch('/posts/refresh/' + usernameVal.value)
-    
+
     if (!response)
         return
-    
+
     buildUserPosts(response, false, null, postList)
 }
 
@@ -143,7 +143,7 @@ loadOlderFriend.onclick = async function () {
     buildUserPosts(response, true, observedName.value, postListFriend)
 }
 
-refreshFriend.onclick = async function() {
+refreshFriend.onclick = async function () {
     let response = await doFetch('/posts/refresh/' + observedName.value)
 
     if (!response)
@@ -154,7 +154,7 @@ refreshFriend.onclick = async function() {
 
 // Handle your feed 
 
-loadOlderFeed.onclick = async function()  {
+loadOlderFeed.onclick = async function () {
     showFeed(true);
 }
 
@@ -227,7 +227,7 @@ function buildUserPosts(response, append: boolean, username: string, list): void
         let node = document.createElement("LI");
 
         if (username || response[idxActual]['observed']) {
-            let actualUsername = username ? username : response[idxActual]['observed']; 
+            let actualUsername = username ? username : response[idxActual]['observed'];
             let usernameElem = document.createElement("h3");
             usernameElem.classList.add('TitleAndName');
             usernameElem.classList.add('postsHeaders');
@@ -319,10 +319,10 @@ async function showFeed(getOlder: boolean) {
     } else {
         request = '/refreshFeed'
     }
-    
+
     let response = await doFetch(request)
 
-    if(!response) {
+    if (!response) {
         return console.log("DEBUG: Response was empty")
     }
 
