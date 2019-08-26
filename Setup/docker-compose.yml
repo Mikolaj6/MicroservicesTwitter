@@ -1,0 +1,8 @@
+version: "3"
+services:
+  setup:
+    build: .
+    image: setup
+    container_name: setup
+    volumes:
+      - ../commonDb.db:/opt/setup/commonDb.db

@@ -1,0 +1,29 @@
+{
+  "name": "freshtemplate",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^12.6.8"
+  },
+  "dependencies": {
+    "@types/sqlite3": "^3.1.5",
+    "bcrypt": "^3.0.6",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.4",
+    "csurf": "^1.10.0",
+    "ejs": "^2.6.2",
+    "express": "^4.17.1",
+    "express-fileupload": "^1.1.5",
+    "express-session": "^1.16.2",
+    "path": "^0.12.7",
+    "redis": "^2.8.0",
+    "sqlite3": "^4.0.9",
+    "url": "^0.11.0"
+  }
+}
