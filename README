@@ -1,0 +1,33 @@
+Hello, this is twitter 2.0!!!
+
+Overview:
+    This project was built for my microservices class with node js, express, sqlite3, redis and docker.
+
+Requirements:
+    docker and docker-compose
+
+Usage:
+    First clone this repo
+    Run './setup.sh' in the main directory (to create empty database/clear existing)
+    Run 'docker-compose build && docker-compose up' in the main directory
+    Finally, open in browser: http://localhost:8888/register
+    To shut servers down run 'docker-compose down' in the main directory
+
+Description:
+    The service consists of 5 containers Front-End, Posts, Relations, Users and Redis
+    
+    User comunicates only with Front-End.
+    Front-End comunicates with other containers either with redis (asynchronous) or with http requests (synchronous),
+    asynchronous commands include registering a new user adding a new relation or postm, while synchronous is or example login.
+    Front-End containers also handles user tokens and csrf protection tokens.
+
+    Users container handles login and register, storing hashed passwords in database.
+
+    Relations container handles information concerning who user observes whom.
+
+    Posts container handles requests for posts of specific user.
+
+    All containers share common.db using volumes.
+
+Possible future improvements:
+    Caching "hot" data, scaling containers with docker-compose and introducing a load balancer
