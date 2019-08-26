@@ -80,7 +80,13 @@ app.get('/resetDatesOnYourPosts', verifyToken, function (req, res) {
     
     if (req.session.users) {
         req.session.users = {}
-        console.log("DEBUG: Reseted dates")
+        console.log("DEBUG: Reseted individual dates")
+    }
+
+    if (req.session.usersFeed) {
+        req.session.usersFeed = {}
+        req.session.usersFeed.users = {}
+        console.log("DEBUG: Reseted feed dates")
     }
 
     res.send();
@@ -397,7 +403,65 @@ function getMoreUpdatePostRequestTimes(userName, session) {
     }
 }
 
-async function getMoreFeedOrRefresh(req, res, refresh) {
+function incrementLast(session) {
+    if (!session.usersFeed) {
+        session.usersFeed = {};
+        session.usersFeed.users = {};
+        console.log("DEBUG: creating and array")
+    }
+
+    if (!session.usersFeed.last) {
+        session.usersFeed.starting = Date.now()
+        session.usersFeed.last = Date.now()
+        console.log("DEBUG: STARTING:" + session.usersFeed.starting)
+    } else {
+        session.usersFeed.last -= POSTS_TIME_DIFF
+    }
+}
+
+function feedTimesLoadMoreUserPosts(userName, session) {
+    if (!session.usersFeed) {
+        session.usersFeed = {};
+        session.usersFeed.users = {};
+        console.log("DEBUG: creating and array")
+    }
+    
+    if (!session.usersFeed.last) {
+        session.usersFeed.starting = Date.now()
+        session.usersFeed.last = Date.now()
+        console.log("DEBUG: STARTING:" + session.usersFeed.starting)
+    }
+
+    if (!session.usersFeed.users[userName]) {
+        session.usersFeed.users[userName] = {};
+        console.log("DEBUG: LoadMore creating object for " + userName)
+        return [session.usersFeed.starting, session.usersFeed.last - POSTS_TIME_DIFF]
+    } else {
+        return [session.usersFeed.last, session.usersFeed.last - POSTS_TIME_DIFF]
+    }
+}
+
+function feedTimesRefreshUserPosts(userName, session, newStartingTime) {
+    if (!session.usersFeed) {
+        session.usersFeed = {};
+        session.usersFeed.users = {};
+        console.log("DEBUG: creating and array")
+    }
+
+    if (!session.usersFeed.last) {
+        return null;
+    }
+
+    if (!session.usersFeed.users[userName]) {
+        session.usersFeed.users[userName] = {};
+        console.log("DEBUG: Refresh creating object for " + userName)
+        return [newStartingTime, session.usersFeed.last]
+    } else {
+        return [newStartingTime, session.usersFeed.starting]
+    }
+}
+
+async function getMoreFeedOrRefresh(req, res, refresh: boolean) {
     let request = 'http://' + relationsServer + '/observing/' + res.locals.username
     let response = await doRequest(request)
 
@@ -405,6 +469,11 @@ async function getMoreFeedOrRefresh(req, res, refresh) {
         return null;
 
     let finalResponse = []
+    let newStartingTime
+
+    if(refresh) {
+        newStartingTime = Date.now()
+    }
 
     for (let elem in response) {
         let observed = response[elem].observed
@@ -412,14 +481,14 @@ async function getMoreFeedOrRefresh(req, res, refresh) {
 
         let request
         if (!refresh){
-            getMoreUpdatePostRequestTimes(observed, req.session);
-            request = 'http://' + postsServer + '/posts/' + observed + '/' + req.session.users[observed].last + '/' + (req.session.users[observed].last - POSTS_TIME_DIFF).toString()
+            let times = feedTimesLoadMoreUserPosts(observed, req.session);
+            request = 'http://' + postsServer + '/posts/' + observed + '/' + times[0] + '/' + times[1]
         } else {
-            let tmp = refreshUpdatePostRequestTimes(observed, req.session)
-            if (!tmp) {
+            let times = feedTimesRefreshUserPosts(observed, req.session, newStartingTime)
+            if (!times) {
                 return null;
             }
-            request = 'http://' + postsServer + '/posts/' + observed + '/' + req.session.users[observed].starting + '/' + tmp
+            request = 'http://' + postsServer + '/posts/' + observed + '/' + times[0] + '/' + times[1]
         }
 
         let responseProcessed = await doRequest(request);
@@ -428,6 +497,12 @@ async function getMoreFeedOrRefresh(req, res, refresh) {
             responseProcessed[postIdx].observed = response[elem].observed
         }
         finalResponse.push(...responseProcessed)
+    }
+
+    if (refresh) {
+        req.session.usersFeed.starting = newStartingTime;
+    } else {
+        incrementLast(req.session)
     }
 
     finalResponse.sort(function (a, b) { 

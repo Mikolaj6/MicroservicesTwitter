@@ -68,6 +68,7 @@ friendsPostsClose.onclick = function () {
 window.onclick = function (event) {
     if (event.target == friendPostsPopup) {
         friendPostsPopup.style.display = "none";
+        postListFriend.innerHTML = ""
         doFetch('/resetDatesOnYourPosts')
     } else if (event.target == newPostPopup || event.target == feedPopup || event.target == yourPostsPopup || event.target == friendsPopup) {
         newPostPopup.style.display = "none";
